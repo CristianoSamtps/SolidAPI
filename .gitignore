@@ -1,0 +1,32 @@
+# Build (.NET)
+[Bb]in/
+[Oo]bj/
+*.pdb
+
+# IDEs
+.vs/
+.idea/
+*.user
+*.suo
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+
+# NuGet
+*.nupkg
+packages/
+
+# SQLite gerada em runtime pela API
+# (a BD de exemplo para a entrega fica em Data/ e NAO e ignorada)
+SolidApi/*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Logs e temporarios
+*.log
+*.tmp
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
