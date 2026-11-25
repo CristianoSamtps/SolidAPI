@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="500"
+        x:Class="SensorApp.MainWindow"
+        Width="450"
+        SizeToContent="Height"
+        Title="Sensor de Humidade - SOLID">
+    <StackPanel Margin="20" Spacing="10">
+
+        <!-- Humidade atual -->
+        <TextBlock Text="Humidade do solo" FontSize="16"/>
+        <TextBlock Name="txtHumidade"
+                   Text="-- %"
+                   FontSize="48"
+                   FontWeight="Bold"/>
+
+        <!-- Botões -->
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Name="btnLigar"
+                    Content="Ligar"
+                    Width="100"
+                    HorizontalContentAlignment="Center"
+                    Background="#2E7D32"
+                    Foreground="White"
+                    Click="BtnLigar_Click"/>
+            <Button Name="btnDesligar"
+                    Content="Desligar"
+                    Width="100"
+                    HorizontalContentAlignment="Center"
+                    IsEnabled="False"
+                    Click="BtnDesligar_Click"/>
+        </StackPanel>
+
+        <!-- Histórico das medições (a mais recente aparece em cima) -->
+        <TextBlock Text="Histórico" Margin="0,10,0,0"/>
+        <TextBox Name="txtMessages"
+                 Height="250"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 FontFamily="Consolas,Menlo,monospace"/>
+
+        <!-- Estado -->
+        <TextBlock Name="txtStatus" Text="Sensor desligado"/>
+
+    </StackPanel>
+</Window>
