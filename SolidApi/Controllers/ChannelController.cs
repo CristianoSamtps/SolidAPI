@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SolidApi.Database;
 using SolidApi.Models;
+using SolidApi.Services;
+using SolidApi.Helpers;
 
 namespace SolidApi.Controllers;
 
@@ -9,10 +11,12 @@ namespace SolidApi.Controllers;
 public class ChannelController : ControllerBase
 {
     private readonly SolidDatabase _database;
+    private readonly DiscoveryService _discovery;
 
-    public ChannelController(SolidDatabase database)
+    public ChannelController(SolidDatabase database, DiscoveryService discovery)
     {
         _database = database;
+        _discovery = discovery;
     }
 
     /// <summary>
@@ -64,61 +68,31 @@ public class ChannelController : ControllerBase
 
         command.Parameters.AddWithValue(
             "$dtCreation",
-            DateTime.UtcNow.ToString("s"));
+            Clock.NowIso());
 
         command.ExecuteNonQuery();
 
         return StatusCode(201, channel);
     }
 
-    /// <summary>
-    /// Discovers all channels belonging to an application.
-    /// </summary>
-    [HttpGet("{application}")]
-    [ProducesResponseType(typeof(string[]), 200)]
-    public IActionResult DiscoverChannels(
-        string application,
-        [FromHeader(Name = "solid-discovery")]
-        string discovery)
-    {
-        using var connection = _database.OpenConnection();
-
-        using var command = connection.CreateCommand();
-
-        command.CommandText = @"
-            SELECT c.ResourceName
-            FROM Channels c
-            JOIN Applications a
-                ON a.Id = c.ApplicationId
-            WHERE a.ResourceName = $application;";
-
-        command.Parameters.AddWithValue(
-            "$application",
-            application);
-
-        var results = new List<string>();
-
-        using var reader = command.ExecuteReader();
-
-        while (reader.Read())
-        {
-            results.Add(
-                $"/api/solid/{application}/{reader.GetString(0)}");
-        }
-
-        return Ok(results);
-    }
+    // O discovery de canais (GET /api/solid/{app} com solid-discovery) passou para
+    // o DiscoveryService, chamado pelo ApplicationController, dono desse URI.
 
     /// <summary>
-    /// Retrieves a channel.
+    /// Retrieves a channel. With the solid-discovery header, returns the paths found inside it.
     /// </summary>
     [HttpGet("{application}/{channel}")]
     [ProducesResponseType(typeof(ChannelResource), 200)]
+    [ProducesResponseType(typeof(List<string>), 200)]
     [ProducesResponseType(404)]
-    public ActionResult<ChannelResource> GetChannel(
+    public IActionResult GetChannel(
         string application,
-        string channel)
+        string channel,
+        [FromHeader(Name = "solid-discovery")] string? discovery)
     {
+        if (discovery != null)
+            return Ok(_discovery.Find(discovery, application, channel));
+
         using var connection = _database.OpenConnection();
 
         using var command = connection.CreateCommand();

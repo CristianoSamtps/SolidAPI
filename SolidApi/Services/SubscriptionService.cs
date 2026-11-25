@@ -1,6 +1,6 @@
+using SolidApi.Helpers;
 using SolidApi.Models;
 using SolidApi.Repositories;
-using System.Globalization;
 
 namespace SolidApi.Services;
 
@@ -41,26 +41,9 @@ public class SubscriptionService
             throw new ArgumentException("Invalid endpoint.");
         }
 
-        // 5. Validar a data de expiração
-        if (!string.IsNullOrWhiteSpace(resource.DtExpiration))
-        {
-            if (!DateTimeOffset.TryParse(
-                resource.DtExpiration,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.RoundtripKind,
-                out var expiration))
-            {
-                throw new ArgumentException("Invalid expiration date.");
-            }
-
-            resource.DtExpiration = expiration.ToString(
-                "yyyy-MM-ddTHH:mm:ss",
-                CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            resource.DtExpiration = "";
-        }
+        // 5. Validar a data de expiração (formato do enunciado, hora local, não pode estar no passado)
+        // Vazio = não expira: o repositório grava NULL
+        resource.DtExpiration = Clock.NormalizeExpiration(resource.DtExpiration) ?? "";
 
         // 6. Gerar nome automaticamente se necessário
         if (string.IsNullOrWhiteSpace(resource.ResourceName) ||
@@ -77,10 +60,8 @@ public class SubscriptionService
             resource.ResourceName = name;
         }
 
-        // 7. Gerar data de criação
-        resource.DtCreation = DateTime.UtcNow.ToString(
-            "yyyy-MM-ddTHH:mm:ss",
-            CultureInfo.InvariantCulture);
+        // 7. Gerar data de criação (hora local, decisão 3 do grupo)
+        resource.DtCreation = Clock.NowIso();
 
         // 8. Guardar na base de dados
         _repo.Create(app, channel, resource);
