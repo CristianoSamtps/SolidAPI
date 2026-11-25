@@ -80,6 +80,95 @@ public class SubscriptionRepository
         return GetByName(app, channel, resourceName) != null;
     }
 
+    public List<(string ChannelName, string ResourceName)> GetAllByApplication(string app)
+    {
+        var subscriptions = new List<(string, string)>();
+
+        using var connection = _database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+        SELECT c.ResourceName, s.ResourceName
+        FROM Subscriptions s
+        INNER JOIN Channels c ON c.Id = s.ChannelId
+        INNER JOIN Applications a ON a.Id = c.ApplicationId
+        WHERE a.ResourceName = $app;
+    ";
+
+        command.Parameters.AddWithValue("$app", app);
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            subscriptions.Add((
+                reader.GetString(0),
+                reader.GetString(1)
+            ));
+        }
+
+        return subscriptions;
+    }
+
+    //Obter todas as subscriptions do middleware
+    public List<(string AppName, string ChannelName, string ResourceName)> GetAll()
+    {
+        var subscriptions = new List<(string, string, string)>();
+
+        using var connection = _database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+        SELECT a.ResourceName, c.ResourceName, s.ResourceName
+        FROM Subscriptions s
+        INNER JOIN Channels c ON c.Id = s.ChannelId
+        INNER JOIN Applications a ON a.Id = c.ApplicationId;
+    ";
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            subscriptions.Add((
+                reader.GetString(0),
+                reader.GetString(1),
+                reader.GetString(2)
+            ));
+        }
+
+        return subscriptions;
+    }
+
+    //Obter todas as subscriptions de um channel
+    public List<string> GetAllByChannel(string app, string channel)
+    {
+        var subscriptions = new List<string>();
+
+        using var connection = _database.OpenConnection();
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+        SELECT s.ResourceName
+        FROM Subscriptions s
+        INNER JOIN Channels c ON c.Id = s.ChannelId
+        INNER JOIN Applications a ON a.Id = c.ApplicationId
+        WHERE a.ResourceName = $app
+          AND c.ResourceName = $channel;
+    ";
+
+        command.Parameters.AddWithValue("$app", app);
+        command.Parameters.AddWithValue("$channel", channel);
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            subscriptions.Add(reader.GetString(0));
+        }
+
+        return subscriptions;
+    }
+
 
     // Consultar uma subscription
     public SubscriptionResource? GetByName(

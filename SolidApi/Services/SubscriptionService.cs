@@ -125,4 +125,60 @@ public class SubscriptionService
         return _repo.Delete(app, channel, resourceName);
     }
 
+    public List<string> DiscoverByApplication(string app)
+    {
+        var subscriptions = _repo.GetAllByApplication(app);
+
+        var paths = new List<string>();
+
+        foreach (var subscription in subscriptions)
+        {
+            string path =
+                $"/api/solid/{app}/{subscription.ChannelName}/subs/{subscription.ResourceName}";
+
+            paths.Add(path);
+        }
+
+        return paths;
+    }
+
+    public List<string> DiscoverAll()
+    {
+        var subscriptions = _repo.GetAll();
+
+        var paths = new List<string>();
+
+        foreach (var subscription in subscriptions)
+        {
+            string path =
+                $"/api/solid/{subscription.AppName}/{subscription.ChannelName}/subs/{subscription.ResourceName}";
+
+            paths.Add(path);
+        }
+
+        return paths;
+    }
+
+    public List<string> DiscoverByChannel(string app, string channel)
+    {
+        var subscriptions = _repo.GetAllByChannel(app, channel);
+
+        var paths = new List<string>();
+
+        foreach (var subscription in subscriptions)
+        {
+            string path =
+                $"/api/solid/{app}/{channel}/subs/{subscription}";
+
+            paths.Add(path);
+        }
+
+        return paths;
+    }
+
+    public bool ChannelExists(string app, string channel)
+    {
+        return _repo.ChannelExists(app, channel);
+    }
+
 }
