@@ -9,8 +9,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<SolidDatabase>();
 
-builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddSingleton<SolidDatabase>();
 builder.Services.AddScoped<SubscriptionRepository>();
+builder.Services.AddScoped<SubscriptionService>();
 
 var app = builder.Build();
 

@@ -27,4 +27,19 @@ public class SubscriptionController : ControllerBase
 
         return Created(result.Path, result.Resource);
     }
+
+
+    //GET /api/solid/{app}/{channel}/subs/{subscription}
+    //Consultar uma subscription
+    [HttpGet("subs/{subscription}")]
+    public IActionResult Get(
+        string app,
+        string channel,
+        string subscription)
+    {
+        var result = _service.Get(app, channel, subscription);
+
+        return Ok(result);
+    }
+
 }

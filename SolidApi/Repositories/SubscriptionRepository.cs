@@ -1,38 +1,154 @@
+using Microsoft.Data.Sqlite;
+using SolidApi.Database;
 using SolidApi.Models;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace SolidApi.Repositories;
 
 public class SubscriptionRepository
 {
-    private readonly List<SubscriptionResource> _subscriptions = new();
+    private readonly SolidDatabase _database;
 
-    public void Create(SubscriptionResource resource)
+    public SubscriptionRepository(SolidDatabase database)
     {
-        _subscriptions.Add(resource);
+        _database = database;
     }
 
-    public SubscriptionResource? GetByName(string resourceName)
+    // Criar uma subscription
+    public void Create(
+        string app,
+        string channel,
+        SubscriptionResource resource)
     {
-        return _subscriptions.FirstOrDefault(
-            s => s.ResourceName == resourceName
+        using var connection = _database.OpenConnection();
+
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+            INSERT INTO Subscriptions
+                (ChannelId, ResourceName, Evt, Endpoint,
+                 DtCreation, DtExpiration)
+            SELECT c.Id, $name, $evt, $endpoint, $creation, $expiration
+            FROM Channels c
+            INNER JOIN Applications a ON a.Id = c.ApplicationId
+            WHERE a.ResourceName = $app
+              AND c.ResourceName = $channel;
+        ";
+
+        command.Parameters.AddWithValue("$app", app);
+        command.Parameters.AddWithValue("$channel", channel);
+        command.Parameters.AddWithValue("$name", resource.ResourceName);
+        command.Parameters.AddWithValue("$evt", resource.Evt);
+        command.Parameters.AddWithValue("$endpoint", resource.Endpoint!);
+        command.Parameters.AddWithValue("$creation", resource.DtCreation);
+
+        command.Parameters.AddWithValue(
+            "$expiration",
+            string.IsNullOrWhiteSpace(resource.DtExpiration)
+                ? DBNull.Value
+                : resource.DtExpiration
         );
+
+        int rows = command.ExecuteNonQuery();
+
+        if (rows == 0)
+            throw new InvalidOperationException("Channel not found.");
     }
 
-    public bool Delete(string resourceName)
+    //Verificar se o channel existe
+    public bool ChannelExists(string app, string channel)
     {
-        var subscription = GetByName(resourceName);
+        using var connection = _database.OpenConnection();
+        using var command = connection.CreateCommand();
 
-        if (subscription == null)
-            return false;
+        command.CommandText = @"
+        SELECT COUNT(*)
+        FROM Channels c
+        INNER JOIN Applications a ON a.Id = c.ApplicationId
+        WHERE a.ResourceName = $app
+          AND c.ResourceName = $channel;
+    ";
 
-        _subscriptions.Remove(subscription);
-        return true;
+        command.Parameters.AddWithValue("$app", app);
+        command.Parameters.AddWithValue("$channel", channel);
+
+        return Convert.ToInt32(command.ExecuteScalar()) > 0;
     }
 
-    public List<SubscriptionResource> GetAll()
+    //Verificar se já existe uma subscription com aquele nome no mesmo channel
+    public bool ExistsByName(string app, string channel, string resourceName)
     {
-        return _subscriptions;
+        return GetByName(app, channel, resourceName) != null;
+    }
+
+
+    // Consultar uma subscription
+    public SubscriptionResource? GetByName(
+        string app,
+        string channel,
+        string resourceName)
+    {
+        using var connection = _database.OpenConnection();
+
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+            SELECT s.ResourceName, s.Evt, s.Endpoint,
+                   s.DtCreation, s.DtExpiration
+            FROM Subscriptions s
+            INNER JOIN Channels c ON c.Id = s.ChannelId
+            INNER JOIN Applications a ON a.Id = c.ApplicationId
+            WHERE a.ResourceName = $app
+              AND c.ResourceName = $channel
+              AND s.ResourceName = $name;
+        ";
+
+        command.Parameters.AddWithValue("$app", app);
+        command.Parameters.AddWithValue("$channel", channel);
+        command.Parameters.AddWithValue("$name", resourceName);
+
+        using var reader = command.ExecuteReader();
+
+        if (!reader.Read())
+            return null;
+
+        return new SubscriptionResource
+        {
+            ResourceName = reader.GetString(0),
+            Evt = reader.GetInt32(1),
+            Endpoint = reader.GetString(2),
+            DtCreation = reader.GetString(3),
+            DtExpiration = reader.IsDBNull(4)
+                ? ""
+                : reader.GetString(4)
+        };
+    }
+
+    // Eliminar uma subscription
+    public bool Delete(
+        string app,
+        string channel,
+        string resourceName)
+    {
+        using var connection = _database.OpenConnection();
+
+        using var command = connection.CreateCommand();
+
+        command.CommandText = @"
+            DELETE FROM Subscriptions
+            WHERE ResourceName = $name
+              AND ChannelId = (
+                  SELECT c.Id
+                  FROM Channels c
+                  INNER JOIN Applications a ON a.Id = c.ApplicationId
+                  WHERE a.ResourceName = $app
+                    AND c.ResourceName = $channel
+              );
+        ";
+
+        command.Parameters.AddWithValue("$app", app);
+        command.Parameters.AddWithValue("$channel", channel);
+        command.Parameters.AddWithValue("$name", resourceName);
+
+        return command.ExecuteNonQuery() > 0;
     }
 }
