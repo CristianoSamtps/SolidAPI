@@ -15,19 +15,8 @@ public class SubscriptionController : ControllerBase
         _service = service;
     }
 
-    // POST /api/solid/{app}/{channel}
-    // Criar uma subscription
-    [HttpPost]
-    public IActionResult Create(
-        string app,
-        string channel,
-        [FromBody] SubscriptionResource resource)
-    {
-        var result = _service.Create(app, channel, resource);
-
-        return Created(result.Path, result.Resource);
-    }
-
+    // O POST /api/solid/{app}/{channel} (criar subscription) está no ChannelItemsController,
+    // porque o mesmo URI também cria data-records. Continua a usar o SubscriptionService.Create.
 
     //GET /api/solid/{app}/{channel}/subs/{subscription}
     //Consultar uma subscription
