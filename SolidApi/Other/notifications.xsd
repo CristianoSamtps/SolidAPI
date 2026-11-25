@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="notifications">
+
+        <xs:complexType>
+
+            <xs:sequence>
+
+                <xs:element
+                    name="notification"
+                    maxOccurs="unbounded">
+
+                    <xs:complexType>
+
+                        <xs:sequence>
+
+                            <xs:element
+                                name="event">
+
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="creation"/>
+                                        <xs:enumeration value="deletion"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+
+                            </xs:element>
+
+                            <xs:element
+                                name="resource-type"
+                                type="xs:string"/>
+
+                            <xs:element
+                                name="resource-name"
+                                type="xs:string"/>
+
+                            <xs:element
+                                name="resource-path"
+                                type="xs:string"/>
+
+                            <xs:element
+                                name="content-type"
+                                type="xs:string"/>
+
+                            <xs:element
+                                name="content"
+                                type="xs:string"/>
+
+                            <xs:element
+                                name="timestamp"
+                                type="xs:dateTime"/>
+
+                            <xs:element
+                                name="valve-state">
+
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="OPEN"/>
+                                        <xs:enumeration value="CLOSED"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+
+                            </xs:element>
+
+                        </xs:sequence>
+
+                    </xs:complexType>
+
+                </xs:element>
+
+            </xs:sequence>
+
+        </xs:complexType>
+
+    </xs:element>
+
+</xs:schema>
