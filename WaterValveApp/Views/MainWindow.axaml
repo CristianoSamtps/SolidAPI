@@ -1,0 +1,185 @@
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WaterValveApp.ViewModels"
+        x:Class="WaterValveApp.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Water Valve"
+        Width="950"
+        Height="650"
+        MinWidth="750"
+        MinHeight="550"
+        Background="#F1F5F9">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- HEADER -->
+        <Border Grid.Row="0"
+                Background="#172B4D"
+                Padding="30,20">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Water Valve"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="White"/>
+
+                    <TextBlock Text="Smart Irrigation · Water Management"
+                               FontSize="13"
+                               Foreground="#CBD5E1"/>
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        Background="#254D42"
+                        CornerRadius="15"
+                        Padding="12,7"
+                        VerticalAlignment="Center">
+
+                    <TextBlock Text="● Sistema ativo"
+                               Foreground="#86EFAC"
+                               FontSize="12"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="1"
+              Margin="25"
+              RowDefinitions="Auto,*"
+              RowSpacing="20">
+
+            <!-- MONITORING CARDS -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="20">
+
+                <!-- HUMIDITY -->
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="22">
+
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="HUMIDADE ATUAL"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="#64748B"/>
+
+                        <TextBlock Text="-- %"
+                                   FontSize="40"
+                                   FontWeight="Bold"
+                                   Foreground="#2476C7"/>
+
+                        <TextBlock Text="À espera de medições..."
+                                   FontSize="13"
+                                   Foreground="#64748B"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- VALVE -->
+                <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="22">
+
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="ESTADO DA VÁLVULA"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="#64748B"/>
+
+                        <TextBlock Text="OFF"
+                                   FontSize="40"
+                                   FontWeight="Bold"
+                                   Foreground="#DC5555"/>
+
+                        <TextBlock Text="Válvula desligada"
+                                   FontSize="13"
+                                   Foreground="#64748B"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- CONFIGURATION + NOTIFICATIONS -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="20">
+
+                <!-- CONFIGURATION -->
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="22">
+
+                    <StackPanel Spacing="16">
+
+                        <TextBlock Text="Configuração"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="#172B4D"/>
+
+                        <TextBlock Text="Define o limite mínimo de humidade."
+                                   FontSize="13"
+                                   Foreground="#64748B"/>
+
+                        <TextBlock Text="Limite de humidade (%)"
+                                   FontSize="13"
+                                   FontWeight="Medium"
+                                   Foreground="#334155"/>
+
+                        <TextBox Text="{Binding HumidityThreshold}"
+                                 Height="40"
+                                 Padding="10,7"
+                                 Background="#F8FAFC"
+                                 Foreground="#172B4D"
+                                 BorderBrush="#CBD5E1"
+                                 BorderThickness="1"
+                                 Watermark="Ex.: 40"/>
+
+                        <Button Content="Guardar limite"
+                                Command="{Binding SaveThresholdCommand}"
+                                Height="42"
+                                Background="#2476C7"
+                                Foreground="White"
+                                HorizontalAlignment="Stretch"/>
+
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   FontSize="12"
+                                   Foreground="#64748B"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- NOTIFICATIONS -->
+                <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="22">
+
+                    <StackPanel Spacing="15">
+
+                        <TextBlock Text="Notificações recentes"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="#172B4D"/>
+
+                        <TextBlock Text="Histórico de eventos recebidos"
+                                   FontSize="13"
+                                   Foreground="#64748B"/>
+
+                        <Border Background="#F8FAFC"
+                                CornerRadius="8"
+                                Padding="12">
+
+                            <TextBlock Text="Ainda não foram recebidas notificações."
+                                       FontSize="13"
+                                       Foreground="#64748B"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

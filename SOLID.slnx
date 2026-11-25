@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="SolidApi/SolidApi.csproj" />
   <Project Path="SensorApp/SensorApp.csproj" />
+  <Project Path="WaterValveApp/WaterValveApp.csproj" />
 </Solution>
