@@ -1,8 +1,14 @@
+using SolidApi.Services;
+using SolidApi.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<SubscriptionService>();
+builder.Services.AddScoped<SubscriptionRepository>();
 
 var app = builder.Build();
 
