@@ -1,0 +1,470 @@
+openapi: 3.0.3
+
+info:
+  title: SOLID Middleware API
+  description: >
+    Service-Oriented Layer for Interoperable Data (SOLID).
+
+    REST API developed for the Systems Integration project.
+
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8765
+
+tags:
+  - name: Applications
+  - name: Channels
+  - name: Data Records
+  - name: Subscriptions
+  - name: Discovery
+
+paths:
+
+  /api/solid:
+
+    post:
+      tags:
+        - Applications
+
+      summary: Create Application
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+
+      responses:
+        '201':
+          description: Application created
+
+    get:
+      tags:
+        - Discovery
+
+      summary: Discovery operation
+
+      parameters:
+        - $ref: '#/components/parameters/SolidDiscovery'
+
+      responses:
+        '200':
+          description: List of resource paths
+
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/solid/{application}:
+
+    parameters:
+      - name: application
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Applications
+
+      summary: Retrieve Application
+
+      responses:
+        '200':
+          description: Application data
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+
+        '404':
+          description: Application not found
+
+    put:
+      tags:
+        - Applications
+
+      summary: Update Application
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+
+      responses:
+        '200':
+          description: Application updated
+
+    delete:
+      tags:
+        - Applications
+
+      summary: Delete Application
+
+      responses:
+        '204':
+          description: Application deleted
+
+    post:
+      tags:
+        - Channels
+
+      summary: Create Channel
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+
+      responses:
+        '201':
+          description: Channel created
+
+  /api/solid/{application}/{channel}:
+
+    parameters:
+
+      - name: application
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Channels
+
+      summary: Retrieve Channel
+
+      responses:
+        '200':
+          description: Channel data
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+
+        '404':
+          description: Channel not found
+
+    put:
+      tags:
+        - Channels
+
+      summary: Update Channel
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+
+      responses:
+        '200':
+          description: Channel updated
+
+    delete:
+      tags:
+        - Channels
+
+      summary: Delete Channel
+
+      responses:
+        '204':
+          description: Channel deleted
+
+    post:
+      tags:
+        - Data Records
+        - Subscriptions
+
+      summary: Create Data Record OR Subscription
+
+      description: >
+        The resource type is determined by the
+        "res-type" property.
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+
+              oneOf:
+                - $ref: '#/components/schemas/DataRecord'
+                - $ref: '#/components/schemas/Subscription'
+
+      responses:
+        '201':
+          description: Resource created
+
+  /api/solid/{application}/{channel}/{datarecord}:
+
+    parameters:
+
+      - name: application
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: datarecord
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Data Records
+
+      summary: Retrieve Data Record
+
+      responses:
+        '200':
+          description: Data Record data
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataRecord'
+
+    delete:
+      tags:
+        - Data Records
+
+      summary: Delete Data Record
+
+      responses:
+        '204':
+          description: Data Record deleted
+
+  /api/solid/{application}/{channel}/subs/{subscription}:
+
+    parameters:
+
+      - name: application
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: channel
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: subscription
+        in: path
+        required: true
+        schema:
+          type: string
+
+    get:
+      tags:
+        - Subscriptions
+
+      summary: Retrieve Subscription
+
+      responses:
+        '200':
+          description: Subscription data
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+    delete:
+      tags:
+        - Subscriptions
+
+      summary: Delete Subscription
+
+      responses:
+        '204':
+          description: Subscription deleted
+
+components:
+
+  parameters:
+
+    SolidDiscovery:
+
+      name: solid-discovery
+      in: header
+      required: true
+
+      schema:
+        type: string
+
+        enum:
+          - application
+          - channel
+          - data-record
+          - subscription
+
+      description: Discovery resource type
+
+  schemas:
+
+    Application:
+
+      type: object
+
+      required:
+        - res-type
+
+      properties:
+
+        res-type:
+          type: string
+          example: application
+
+        resource-name:
+          type: string
+          example: app1
+
+        resource-desc:
+          type: string
+          example: Smart Irrigation Application
+
+        dt-creation:
+          type: string
+          format: date-time
+
+    Channel:
+
+      type: object
+
+      required:
+        - res-type
+
+      properties:
+
+        res-type:
+          type: string
+          example: channel
+
+        resource-name:
+          type: string
+          example: humidity
+
+        resource-desc:
+          type: string
+          example: Soil humidity measurements
+
+        dt-creation:
+          type: string
+          format: date-time
+
+    DataRecord:
+
+      type: object
+
+      required:
+        - res-type
+        - content-type
+        - content
+
+      properties:
+
+        res-type:
+          type: string
+          example: data-record
+
+        resource-name:
+          type: string
+          example: dr1
+
+        content-type:
+          type: string
+          example: application/json
+
+        content:
+          type: string
+          example: '{"humidity":42}'
+
+        dt-creation:
+          type: string
+          format: date-time
+
+        dt-expiration:
+          type: string
+          format: date-time
+          nullable: true
+
+    Subscription:
+
+      type: object
+
+      required:
+        - res-type
+        - evt
+        - endpoint
+
+      properties:
+
+        res-type:
+          type: string
+          example: subscription
+
+        resource-name:
+          type: string
+          example: sub1
+
+        evt:
+          type: integer
+          enum:
+            - 1
+            - 2
+
+          description: >
+            1 = creation event
+            2 = deletion event
+
+        endpoint:
+          type: string
+
+          example: http://localhost:8080/notifications
+
+        dt-creation:
+          type: string
+          format: date-time
+
+        dt-expiration:
+          type: string
+          format: date-time
+          nullable: true
+          
