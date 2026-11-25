@@ -11,4 +11,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.0" />
   </ItemGroup>
 
+    <ItemGroup>
+    <None Include="..\Data\schema.sql" Link="Sql\schema.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Data\seed.sql" Link="Sql\seed.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
