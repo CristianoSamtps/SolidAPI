@@ -1,3 +1,5 @@
+using SolidApi.Services;
+using SolidApi.Repositories;
 using SolidApi.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +8,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<SolidDatabase>();
+
+builder.Services.AddSingleton<SolidDatabase>();
+builder.Services.AddScoped<SubscriptionRepository>();
+builder.Services.AddScoped<SubscriptionService>();
 
 var app = builder.Build();
 
