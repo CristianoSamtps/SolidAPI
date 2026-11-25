@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<notifications>
+
+    <notification>
+
+        creation
+
+        <resource-type>data-record</resource-type>
+
+        <resource-name>dr1</resource-name>
+
+        <resource-path>
+            /api/solid/moisture/humidity/dr1
+        </resource-path>
+
+        <content-type>application/json</content-type>
+
+        <content>{"humidity":25}</content>
+
+        <timestamp>2026-11-25T10:30:00</timestamp>
+
+        <valve-state>OPEN</valve-state>
+
+    </notification>
+
+</notifications>
