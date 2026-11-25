@@ -42,4 +42,13 @@ public class SubscriptionController : ControllerBase
         return Ok(result);
     }
 
+    //DELETE /api/solid/{app}/{channel}/subs/{subscription}
+    [HttpDelete("subs/{subscription}")]
+    public IActionResult Delete(string app, string channel, string subscription)
+    {
+        bool deleted = _service.Delete(app, channel, subscription);
+
+        return NoContent();
+    }
+
 }

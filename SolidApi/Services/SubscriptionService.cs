@@ -112,4 +112,17 @@ public class SubscriptionService
         return subscription;
     }
 
+    public bool Delete(string app, string channel, string resourceName)
+    {
+        if (!_repo.ChannelExists(app, channel))
+            throw new KeyNotFoundException("Channel not found.");
+
+        var subscription = _repo.GetByName(app, channel, resourceName);
+
+        if (subscription == null)
+            throw new KeyNotFoundException("Subscription not found.");
+
+        return _repo.Delete(app, channel, resourceName);
+    }
+
 }
